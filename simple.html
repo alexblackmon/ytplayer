@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple YouTube Playlist</title>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <style>
+    body { 
+      font-family: sans-serif; 
+      text-align: center;
+      padding: 20px;
+    }
+    #player { 
+      margin: 20px auto;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple YouTube Playlist Test</h1>
+  <div id="player"></div>
+  <div>
+    <button onclick="prevClip()">Previous</button>
+    <button onclick="togglePlayPause()">Play/Pause</button>
+    <button onclick="nextClip()">Next</button>
+  </div>
+  <div id="info">Loading...</div>
+  
+  <script>
+    // Simple playlist
+    const playlist = [
+      { videoId: "dQw4w9WgXcQ", startTime: "0:00", endTime: "0:30" },
+      { videoId: "9bZkp7q19f0", startTime: "0:00", endTime: "0:30" },
+    ];
+
+    let player;
+    let currentClip = 0;
+    let isPaused = false;
+
+    function timeToSeconds(timeStr) {
+      const parts = timeStr.split(':');
+      if (parts.length === 2) {
+        return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+      }
+      return parseInt(timeStr);
+    }
+
+    function onYouTubeIframeAPIReady() {
+      console.log('YouTube API Ready');
+      player = new YT.Player('player', {
+        height: '315',
+        width: '560',
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange,
+          'onError': onPlayerError
+        }
+      });
+    }
+
+    function onPlayerReady() {
+      console.log('Player Ready');
+      playClip(currentClip);
+    }
+
+    function onPlayerError(event) {
+      console.error('YouTube Error:', event.data);
+      document.getElementById('info').textContent = 'Error loading video: ' + event.data;
+    }
+
+    function playClip(index) {
+      const clip = playlist[index];
+      if (!clip) return;
+      
+      console.log('Playing clip:', clip);
+      document.getElementById('info').textContent = `Clip ${index + 1}: ${clip.videoId}`;
+      
+      const startSeconds = timeToSeconds(clip.startTime);
+      const endSeconds = timeToSeconds(clip.endTime);
+      
+      player.loadVideoById({
+        videoId: clip.videoId,
+        startSeconds: startSeconds,
+        endSeconds: endSeconds
+      });
+    }
+
+    function onPlayerStateChange(event) {
+      console.log('State:', event.data);
+      if (event.data === YT.PlayerState.ENDED && !isPaused) {
+        nextClip();
+      }
+    }
+
+    function nextClip() {
+      if (currentClip < playlist.length - 1) {
+        currentClip++;
+        playClip(currentClip);
+      }
+    }
+
+    function prevClip() {
+      if (currentClip > 0) {
+        currentClip--;
+        playClip(currentClip);
+      }
+    }
+
+    function togglePlayPause() {
+      if (isPaused) {
+        player.playVideo();
+        isPaused = false;
+      } else {
+        player.pauseVideo();
+        isPaused = true;
+      }
+    }
+
+    window.prevClip = prevClip;
+    window.nextClip = nextClip;
+    window.togglePlayPause = togglePlayPause;
+  </script>
+</body>
+</html> 

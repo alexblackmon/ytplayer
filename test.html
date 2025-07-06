@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube API Test</title>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+    <h1>YouTube API Test</h1>
+    <div id="player"></div>
+    <button onclick="loadVideo()">Load Test Video</button>
+    <button onclick="playVideo()">Play</button>
+    <button onclick="pauseVideo()">Pause</button>
+    
+    <script>
+        let player;
+        
+        function onYouTubeIframeAPIReady() {
+            console.log('YouTube API Ready');
+            player = new YT.Player('player', {
+                height: '315',
+                width: '560',
+                videoId: 'dQw4w9WgXcQ',
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
+                }
+            });
+        }
+        
+        function onPlayerReady(event) {
+            console.log('Player Ready');
+        }
+        
+        function onPlayerStateChange(event) {
+            console.log('State changed:', event.data);
+        }
+        
+        function onPlayerError(event) {
+            console.error('Error:', event.data);
+        }
+        
+        function loadVideo() {
+            if (player && player.loadVideoById) {
+                player.loadVideoById('dQw4w9WgXcQ');
+            }
+        }
+        
+        function playVideo() {
+            if (player && player.playVideo) {
+                player.playVideo();
+            }
+        }
+        
+        function pauseVideo() {
+            if (player && player.pauseVideo) {
+                player.pauseVideo();
+            }
+        }
+    </script>
+</body>
+</html> 
